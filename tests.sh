@@ -1,1 +1,1 @@
-python main.py --goal_function gaussian
+python main.py --goal_function two_gaussians --population_size 100 --iterations_per_analysis 2

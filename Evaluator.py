@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Gives 
 class Evaluator:
@@ -14,15 +15,15 @@ class Evaluator:
         return 1
 
     def gaussian(self, x):
-        return np.sum(np.exp(-np.power(x - self.mu1, 2.) / (2 * np.power(self.sigma1, 2.))))
+        return np.sum( (1.0/self.sigma1) * np.exp(-np.power(x - self.mu1, 2.) / (2 * np.power(self.sigma1, 2.))))
 
     def two_gaussians(self, x):
-        return np.sum(np.exp(-np.power(x - self.mu1, 2.) / (2 * np.power(self.sigma1, 2.)))) + \
-            np.sum(np.exp(-np.power(x - self.mu2, 2.) / (2 * np.power(self.sigma2, 2.))))
+        return np.sum( (1.0/self.sigma1) * np.exp(-np.power(x - self.mu1, 2.) / (2 * np.power(self.sigma1, 2.)))) + \
+            np.sum( (1.0/self.sigma2) * np.exp(-np.power(x - self.mu2, 2.) / (2 * np.power(self.sigma2, 2.))))
 
     def rastrigin(self, x):
         n = x.shape[0]
-        return self.A*n + np.sum(x - self.A * np.cos(2 * np.pi * x))
+        return - (self.A*n + np.sum(np.square(x) - self.A * np.cos(2 * np.pi * x)))
 
     def evaluate(self, x):
         if self.goal_function == 'constant':
@@ -35,3 +36,21 @@ class Evaluator:
             return self.rastrigin(x)
         else:
             raise ValueError("incorrect goal function")
+
+    def plot(self):
+        if self.goal_function == 'constant':
+            fun = self.constant
+        elif self.goal_function == 'gaussian':
+            fun = self.gaussian
+        elif self.goal_function == 'two_gaussians':
+            fun = self.two_gaussians
+        elif self.goal_function == 'rastrigin':
+            fun = self.rastrigin
+
+        x = np.linspace(-10, 10, 10000)
+        y = [fun(np.array([el])) for el in x]
+
+        plt.scatter(x, y)
+        plt.savefig(f"graphs/{self.goal_function}")
+
+    

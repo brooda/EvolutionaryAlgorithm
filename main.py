@@ -21,12 +21,29 @@ parser.add_argument('--iterations', type=int, default=200)
 
 parser.add_argument('--iterations_per_analysis', type=int, default=10)
 
-parser.add_argument('--log_file', type=str, default="log.txt")
+parser.add_argument('--log_dir', type=str, default="log")
 
 args = parser.parse_args()
 
 evaluator = Evaluator(args)
-analyzer = Analyzer(args.log_file)
+evaluator.plot()
+
+if (args.log_dir == "log"):
+    if (args.goal_function == "gaussian"):
+        arg_str = f"mu {args.mu1}, sigma {args.sigma1}"
+    elif (args.goal_function == "two_gaussians"):
+        arg_str = f"mu1 {args.mu1}, sigma1 {args.sigma1}, mu2 {args.mu2}, sigma2 {args.sigma2}"
+    elif (args.goal_function == "rastrigin"):
+        arg_str = f"A {args.A}"
+    else:
+        arg_str = ""
+
+    if (arg_str == ""):
+        args.log_dir = f"{args.goal_function}"
+    else:
+        args.log_dir = f"{args.goal_function} args {arg_str}"
+
+analyzer = Analyzer(args.log_dir)
 
 algorithm = EvolutionaryAlgorithm(args, evaluator, analyzer)
 algorithm.Solve()

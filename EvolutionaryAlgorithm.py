@@ -59,10 +59,9 @@ class EvolutionaryAlgorithm:
             self.mutation_success_counter += 1
 
         if self.mutation_success_counter > 0.2 * self.iter:
-            self.mutation_sigma *= 2.0
+            self.mutation_sigma *= 1.3
         else:    
-            self.mutation_sigma /= 2.0
-
+            self.mutation_sigma /= 1.3
 
     def Crossover(self):
         number_of_crossovers = int(self.crossing_probability * self.population_size)
