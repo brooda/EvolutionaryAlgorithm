@@ -12,7 +12,7 @@ class EvolutionaryAlgorithm:
 
         self.iterations_per_analysis = args.iterations_per_analysis
 
-        self.population = 50 * (np.random.rand(self.population_size, self.dim) - 0.5)
+        self.population = 100 * (np.random.rand(self.population_size, self.dim) - 0.5)
 
         self.iter = 0  # current number of iteration
         self.mutation_success_counter = 0
@@ -20,12 +20,15 @@ class EvolutionaryAlgorithm:
         self.evaluator = evaluator
         self.population_analyzer = population_analyzer
         
+        self.use_one_fifth_success_rule = args.use_one_fifth_success_rule
+
 
     def Solve(self):
         for self.iter in range(self.iterations):
             # Analyze clusters in Population     
             if not self.iter % self.iterations_per_analysis:    
                 self.population_analyzer.AnalyzePopulationAndSaveToLog(self.population, self.iter)
+                self.evaluator.plot(self.population, self.iter)
 
             # The population is evaluated (selection). The best adapted individuals take part in the reproduction process
             self.Reproduction()
@@ -55,14 +58,16 @@ class EvolutionaryAlgorithm:
         self.population = self.population + self.mutation_sigma * np.random.normal(size = self.population.shape)
         mean_value_after = np.mean(np.apply_along_axis(self.evaluator.evaluate, 1, self.population))
 
-        if mean_value_after > mean_value_before:
-            self.mutation_success_counter += 1
+        if self.use_one_fifth_success_rule:
+            if mean_value_after > mean_value_before:
+                self.mutation_success_counter += 1
 
-        if self.mutation_success_counter > 0.2 * self.iter:
-            self.mutation_sigma *= 1.3
-        else:    
-            self.mutation_sigma /= 1.3
+            if self.mutation_success_counter > 0.2 * self.iter:
+                self.mutation_sigma *= 1.3
+            else:    
+                self.mutation_sigma /= 1.3
 
+            
     def Crossover(self):
         number_of_crossovers = int(self.crossing_probability * self.population_size)
             

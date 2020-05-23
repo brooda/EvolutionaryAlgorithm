@@ -1,4 +1,5 @@
 import argparse
+import os
 from EvolutionaryAlgorithm import EvolutionaryAlgorithm
 from Evaluator import Evaluator
 from Analyzer import Analyzer
@@ -21,29 +22,39 @@ parser.add_argument('--iterations', type=int, default=200)
 
 parser.add_argument('--iterations_per_analysis', type=int, default=10)
 
+parser.add_argument('--use_one_fifth_success_rule', type=eval, choices=[True, False],  default='True')
+
 parser.add_argument('--log_dir', type=str, default="log")
+parser.add_argument('--rep', type=int, default=0)
 
 args = parser.parse_args()
 
-evaluator = Evaluator(args)
-evaluator.plot()
+print("use_one_fifth_success_rule", args.use_one_fifth_success_rule)
+
 
 if (args.log_dir == "log"):
     if (args.goal_function == "gaussian"):
-        arg_str = f"mu {args.mu1}, sigma {args.sigma1}"
+        arg_str = f"mu_{args.mu1}_sigma_{args.sigma1}"
     elif (args.goal_function == "two_gaussians"):
-        arg_str = f"mu1 {args.mu1}, sigma1 {args.sigma1}, mu2 {args.mu2}, sigma2 {args.sigma2}"
+        arg_str = f"mu1_{args.mu1}_sigma1 {args.sigma1}_mu2_{args.mu2}_sigma2_{args.sigma2}"
     elif (args.goal_function == "rastrigin"):
-        arg_str = f"A {args.A}"
+        arg_str = f"A_{args.A}"
     else:
         arg_str = ""
 
     if (arg_str == ""):
-        args.log_dir = f"{args.goal_function}"
+        args.log_dir = os.path.join("results", f"{args.goal_function}")
     else:
-        args.log_dir = f"{args.goal_function} args {arg_str}"
+        args.log_dir = os.path.join("results", f"{args.goal_function}_{arg_str}")
+
+    args.log_dir = f"{args.log_dir}_dim_{args.dimension}_tournament_{args.tournament_size}_rep_{args.rep}"
 
 analyzer = Analyzer(args.log_dir)
+
+
+evaluator = Evaluator(args)
+evaluator.plot()
+
 
 algorithm = EvolutionaryAlgorithm(args, evaluator, analyzer)
 algorithm.Solve()
