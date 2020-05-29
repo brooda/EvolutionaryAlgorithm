@@ -12,7 +12,12 @@ class EvolutionaryAlgorithm:
 
         self.iterations_per_analysis = args.iterations_per_analysis
 
-        self.population = 100 * (np.random.rand(self.population_size, self.dim) - 0.5)
+        if args.goal_function == "rastrigin":
+            population_multiplier = 20
+        else:
+            population_multiplier = 20
+
+        self.population = population_multiplier * (np.random.rand(self.population_size, self.dim) - 0.5)
 
         self.iter = 0  # current number of iteration
         self.mutation_success_counter = 0
@@ -27,8 +32,7 @@ class EvolutionaryAlgorithm:
         for self.iter in range(self.iterations):
             # Analyze clusters in Population     
             if not self.iter % self.iterations_per_analysis:    
-                self.population_analyzer.AnalyzePopulationAndSaveToLog(self.population, self.iter)
-                self.evaluator.plot(self.population, self.iter)
+                self.population_analyzer.AnalyzePopulationAndSaveToLogAndDrawPlotOfPopulation(self.population, self.iter)
 
             # The population is evaluated (selection). The best adapted individuals take part in the reproduction process
             self.Reproduction()

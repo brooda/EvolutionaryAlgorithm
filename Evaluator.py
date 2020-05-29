@@ -15,7 +15,6 @@ class Evaluator:
         self.log_dir = args.log_dir
         self.dim = args.dimension
 
-
     def constant(self, x):
         return 1
 
@@ -30,7 +29,11 @@ class Evaluator:
 
 
     def rastrigin(self, x):
-        n = x.shape[0]
+        if isinstance(x, (float)):
+            n = 1
+        else:
+            n = x.shape[0]
+
         return - (self.A*n + np.sum(np.square(x) - self.A * np.cos(2 * np.pi * x)))
 
 
@@ -46,11 +49,10 @@ class Evaluator:
         else:
             raise ValueError("incorrect goal function")
 
-
-    def plot(self, population = None, iteration = None):
-        if self.dim > 2:
-            raise Exception("dimension of problem too big")
-
+    # population is an array of elements in clusters sorted in decreasing order (cardinality)
+    def plot(self, path_to_save = None, population = None, iteration = None):
+        colors_of_clusters = ['r', 'g', 'y', 'm', 'k']
+        # red green yellow magenta black
 
         if self.dim == 1:
             evaluate_vect = np.vectorize(self.evaluate)
@@ -61,10 +63,11 @@ class Evaluator:
             plt.plot(x, y, color='b')
 
             if population is None:
-                plt.savefig(os.path.join(self.log_dir, "images", "function.png"))
+                plt.savefig(os.path.join(path_to_save, "function.png"))
             else:
-                plt.scatter(population, evaluate_vect(population), color='r', s=5)
-                plt.savefig(os.path.join(self.log_dir, "images", f"{iteration}.png")) 
+                for i, population_cluster in enumerate(population):
+                    plt.scatter(population_cluster, evaluate_vect(population_cluster), color=colors_of_clusters[i], s=7)
+                    plt.savefig(os.path.join(path_to_save, f"{iteration}.png")) 
 
         elif self.dim == 2:            
             evaluate_vect = np.vectorize(self.evaluate, signature='(n)->()')
@@ -83,7 +86,8 @@ class Evaluator:
             plt.colorbar(cp)
             
             if population is None:
-                plt.savefig(os.path.join(self.log_dir, "images", "function.png"))
+                plt.savefig(os.path.join(path_to_save, "function.png"))
             else:
-                plt.scatter(population[:, 0], population[:, 1], color='r', s=5)
-                plt.savefig(os.path.join(self.log_dir, "images", f"{iteration}.png"))
+                for i, population_cluster in enumerate(population):
+                    plt.scatter(population_cluster[:, 0], population_cluster[:, 1], color=colors_of_clusters[i], s=10)
+                    plt.savefig(os.path.join(path_to_save, f"{iteration}.png"))

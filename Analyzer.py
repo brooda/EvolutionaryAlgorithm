@@ -9,7 +9,9 @@ from sklearn.cluster import KMeans
 import os
 import pickle
 import sys
+from Evaluator import Evaluator
 
+# this can be used for counting number of clusters
 def gap_scores(data, nrefs=3, maxClusters=15):
     """
     Calculates KMeans optimal K using Gap Statistic from Tibshirani, Walther, Hastie
@@ -80,44 +82,54 @@ def gap_scores(data, nrefs=3, maxClusters=15):
     return (gaps.argmax() + 1, resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
 
 class Analyzer:
-    def __init__(self, log_dir):
+    def __init__(self, evaluator, log_dir, max_clusters, should_plot):
         self.log_dir = log_dir
+        self.max_clusters = max_clusters
 
         self.statistics_dir = os.path.join(self.log_dir, "statistics")
         self.images_dir = os.path.join(self.log_dir, "images")
+
+        self.evaluator = evaluator
+
+        self.should_plot = should_plot
 
         try:
             os.mkdir(self.log_dir)
             os.mkdir(self.statistics_dir)
             os.mkdir(self.images_dir)
+
+            for i in range(1, self.max_clusters + 1):
+                os.mkdir(os.path.join(self.statistics_dir, f"clusters={i}"))
+                os.mkdir(os.path.join(self.images_dir, f"clusters={i}"))
+
         except OSError:
             print ("Creation of the directory %s failed" % self.log_dir)
         else:
             print ("Successfully created the directory %s " % self.log_dir)
             
 
-    def AnalyzePopulationAndSaveToLog(self, population, iteration):
-        statistics = self.AnalyzePopulation(population, iteration)
-    
-        print("iteration", statistics["iteration"])
-        print(statistics["optimal_k"])
-        #print(statistics)
+    def AnalyzePopulationAndSaveToLogAndDrawPlotOfPopulation(self, population, iteration):
+        for number_of_clusters in range(1, self.max_clusters + 1):
+            statistics, population_dict = self.AnalyzePopulation(population, iteration, number_of_clusters)
+            
+            if self.should_plot:
+                self.evaluator.plot(os.path.join(self.images_dir, f"clusters={number_of_clusters}"), population_dict, iteration)
 
-        with open(os.path.join(self.statistics_dir, f"{iteration}"), 'wb') as outfile:
-            pickle.dump(statistics, outfile)
+                # bad code, change that
+                if (iteration == 0):
+                    self.evaluator.plot(os.path.join(self.images_dir, f"clusters={number_of_clusters}"))
+
+            with open(os.path.join(self.statistics_dir, f"clusters={number_of_clusters}", f"{iteration}"), 'wb') as outfile:
+                pickle.dump(statistics, outfile)
 
 
-    def AnalyzePopulation(self, population, iteration):
+    def AnalyzePopulation(self, population, iteration, k):
         statistics = {}
         statistics["iteration"] = iteration
         statistics["mean"] = np.mean(population, axis = 0)
         statistics["std"] = np.std(population, axis = 0)
 
-        #k, _ = gap_scores(population, maxClusters=30)
-        k = 3
-        
         statistics["optimal_k"] = k
-
 
         kmeans = KMeans(n_clusters=k)
         kmeans.fit(population)
@@ -134,11 +146,17 @@ class Analyzer:
             cardinality_of_clusters[k] = v.size
             std_in_clusters[k] = np.std(population[v], axis = 0)
 
+        ks = np.array(list(cardinality_of_clusters.keys()))
+        vs = np.array(list(cardinality_of_clusters.values()))
+               
+        sorted_inds = ks[np.flip(np.argsort(vs))]
+
+        population_pieces_descending_cardinality = []
+        for ind in sorted_inds:
+            population_pieces_descending_cardinality.append(population[cluster_to_representants[ind]])
 
         statistics["cardinality_of_clusters"] = cardinality_of_clusters
         statistics["std_in_clusters"] = std_in_clusters
 
-
-
-        return statistics
+        return statistics, population_pieces_descending_cardinality
         
