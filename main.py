@@ -13,11 +13,11 @@ parser.add_argument('--sigma1', type=float, default=0.8)
 parser.add_argument('--mu2', type=float, default=4.0)
 parser.add_argument('--sigma2', type=float, default=1.0)
 
-parser.add_argument('--population_size', type=int, default=200)
+parser.add_argument('--population_size', type=int, default=100)
 parser.add_argument('--dimension', type=int, default=1)
 parser.add_argument('--mutation_sigma', type=float, default=1.0)
 parser.add_argument('--tournament_size', type=int, default=4)
-parser.add_argument('--crossing_probability', type=float, default=0.5)
+parser.add_argument('--crossing_probability', type=float, default=0.7)
 parser.add_argument('--iterations', type=int, default=100)
 
 parser.add_argument('--iterations_per_analysis', type=int, default=10)
