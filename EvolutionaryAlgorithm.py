@@ -99,6 +99,6 @@ class EvolutionaryAlgorithm:
 
     def Succession(self):
         # generative succession - we are taking elements after mutation
-        # we keep population size constant, that's why we are duplicatind some elements sometimes
+        # we keep population size constant, that's why we are duplicating some elements sometimes
         add_individuals = np.random.choice(self.population.shape[0], self.population_size - self.population.shape[0])
         self.population = np.append(self.population, self.population[add_individuals], axis = 0)

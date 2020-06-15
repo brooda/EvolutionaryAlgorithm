@@ -1,27 +1,45 @@
-parser.add_argument('--goal_function', type=str, choices=['constant', 'gaussian', 'two_gaussians', 'rastrigin'], default='constant')
+# Implementation of classical genetic algoritm with interface for inspecting populations dynamically
 
-parser.add_argument('--A', type=float, default=10.0)
+## Files:
+* `EvolutionaryAlgorithm.py` - implementation of GA
+* `Evaluator.py` - goal functions and plotting
+* `Analyzer.py` - class for statistical analysis of clusters in subsequent iterations. Analysis is dumped to pickle binary files
 
-parser.add_argument('--mu1', type=float, default=0.0)
 
-parser.add_argument('--sigma1', type=float, default=1.0)
+## Arguments:
+* `--goal_function, type=str, choices=['constant', 'gaussian', 'two_gaussians', 'rastrigin'], default='constant')`
+* `--A', type=float, default=10.0`
+* `--mu1', type=float, default=0.0`
+* `--sigma1', type=float, default=1.0`
+* `--mu2', type=float, default=4.0`
+* `--sigma2', type=float, default=1.0`
+* `--population_size', type=int, default=1000`
+* `--dimension', type=int, default=1`
+* `--mutation_sigma', type=float, default=1.0`
+* `--tournament_size', type=int, default=4`
+* `--crossing_probability', type=float, default=0.5`
+* `--iterations', type=int, default=200`
+* `--iterations_per_analysis', type=int, default=10`
+* `--log_file', type=str, default="log.txt"`
 
-parser.add_argument('--mu2', type=float, default=4.0)
+Examples of how to run the program are in bash files (test[1, 2, 3, 4, 5].sh)
 
-parser.add_argument('--sigma2', type=float, default=1.0)
 
-parser.add_argument('--population_size', type=int, default=1000)
+## Organization of expetiment pipeline
+Each execution of program mean 3 independent runs of algorithm. In `results` folder, subfolders for each of runs are created.
 
-parser.add_argument('--dimension', type=int, default=1)
+Then, in each subfolder, next subfolders are created:
+* `clusters=1`
+* `clusters=2`
+* `clusters=3`
+* `clusters=4`
+* `clusters=5`
 
-parser.add_argument('--mutation_sigma', type=float, default=1.0)
+Each of those subfolders corresponds to output of clustering for different numbers of clusters.
 
-parser.add_argument('--tournament_size', type=int, default=4)
+Then, in those folder, two folders are created:
+* `images`: for first run of algorithm and for case when domain of function is of dimension 1 or 2, for each iteration function with population is plotted. It is worth noting, that plotting images is the most time consuming element of all pipeline
+* `statistics`: for each iterations statistics about clusters are dumped to those statistics are: cardinality of clusters, means of clusters, standard deviations in clusters
 
-parser.add_argument('--crossing_probability', type=float, default=0.5)
-
-parser.add_argument('--iterations', type=int, default=200)
-
-parser.add_argument('--iterations_per_analysis', type=int, default=10)
-
-parser.add_argument('--log_file', type=str, default="log.txt")
+## Analysis
+In `results/analysis` folder, there is notebook for plotting further needed graphs. More information about it can be achieved upon request.

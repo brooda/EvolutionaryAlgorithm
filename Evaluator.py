@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-# Gives 
 class Evaluator:
     def __init__(self, args):
         self.goal_function = args.goal_function
