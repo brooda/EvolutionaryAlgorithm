@@ -1,5 +1,7 @@
 # Implementation of classical genetic algoritm with interface for inspecting populations dynamically
 
+In `doc` folder there is a report about this project. The following description is about content of `src` directory.
+
 ## Files:
 * `EvolutionaryAlgorithm.py` - implementation of GA
 * `Evaluator.py` - goal functions and plotting
